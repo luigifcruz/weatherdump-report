@@ -1,0 +1,9 @@
+version: '3'
+services:
+  weather-dump-remote:
+    build: .
+    restart: always
+    ports:
+    - "5415:5415"
+    volumes:
+    - .:/code
