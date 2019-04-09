@@ -31,6 +31,8 @@ type Crash struct {
 	SystemCpus       string `schema:"systemCpus,required"`
 	SystemMemory     string `schema:"systemMemory,required"`
 	Timestamp        string `schema:"timestamp,required"`
+	VersionGUI       string `schema:"versionGUI,required"`
+	VersionCLI       string `schema:"versionCLI,required"`
 	Crash            string `schema:"crash,required"`
 }
 
@@ -48,8 +50,8 @@ func crashReporter(w http.ResponseWriter, r *http.Request) {
 	buf, _ := json.Marshal(c)
 
 	crashID := uuid.Must(uuid.NewRandom())
-	err := ioutil.WriteFile("./crashes/"+crashID.String()+".json", []byte(buf), 0755)
-	err = ioutil.WriteFile("./crashes/"+crashID.String()+".txt", []byte(c.Crash), 0755)
+	err := ioutil.WriteFile("./crashes/"+crashID.String()+"."+c.VersionCLI+".json", []byte(buf), 0755)
+	err = ioutil.WriteFile("./crashes/"+crashID.String()+"."+c.VersionCLI+".txt", []byte(c.Crash), 0755)
 	if err != nil {
 		log.Printf("Unable to write file: %v", err)
 	}
