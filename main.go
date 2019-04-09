@@ -18,7 +18,7 @@ func main() {
 	color.Green("Reporter has started.")
 
 	r := mux.NewRouter()
-	r.HandleFunc("/report/crash", crashReporter)
+	r.HandleFunc("/crash", crashReporter)
 
 	http.Handle("/", r)
 	log.Fatal(http.ListenAndServe("0.0.0.0:5415", nil))
@@ -40,22 +40,21 @@ func crashReporter(w http.ResponseWriter, r *http.Request) {
 
 	var c Crash
 	if err := decoder.Decode(&c, r.PostForm); err != nil {
-		
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, "error")
+		fmt.Fprintf(w, "error %s", err)
 		return
 	}
 
 	buf, _ := json.Marshal(c)
 
-	crashId := uuid.Must(uuid.NewRandom())
-	err := ioutil.WriteFile("./crashes/" + crashId.String() + ".json", []byte(buf), 0755)
-	err = ioutil.WriteFile("./crashes/" + crashId.String() + ".txt", []byte(c.Crash), 0755)
+	crashID := uuid.Must(uuid.NewRandom())
+	err := ioutil.WriteFile("./crashes/" + crashID.String() + ".json", []byte(buf), 0755)
+	err = ioutil.WriteFile("./crashes/" + crashID.String() + ".txt", []byte(c.Crash), 0755)
     if err != nil {
         log.Printf("Unable to write file: %v", err)
 	}
 	
-	log.Println("New crash report!", crashId.String())
+	log.Println("New crash report!", crashID.String())
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(c)
